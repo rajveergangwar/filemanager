@@ -1,0 +1,143 @@
+<html>
+<head> 
+	<title>File Browser</title>
+        <script src="//code.jquery.com/jquery-1.12.0.min.js"></script>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css" integrity="sha384-fLW2N01lMqjakBkx3l/M9EahuwpSfeNvV63J5ezn3uZzapT0u7EYsXMjQV+0En5r" crossorigin="anonymous">
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
+</head>
+<body>
+<div class='container'>
+    <div class="row">
+    <div class="page-header">
+        <h1>File manager<small> in nodejs</small></h1>
+    </div>
+    <div class='bredcrumb'>
+    </div>
+        <nav class="navbar navbar-default">
+          <div class="container-fluid">
+            <ul class="nav navbar-nav">
+                <li class="active"><a href="/">go to root</a></li>
+                <li class="dropdown">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Create New<span class="caret"></span></a>
+                <ul class="dropdown-menu">
+                  <li><a href="#" data-toggle="modal" data-target="#createFile">New File</a></li>
+                  <li><a href="#" data-toggle="modal" data-target="#createDir"> New Directory</a></li>
+                </ul>
+              </li>
+            </ul>
+          </div>
+        </nav>
+            <% if (typeof brd != 'undefined' ) {%>
+                <ul class='breadcrumb'>
+                <% for(i=0;i<=brd.length;i++) { var str; %>
+                    <% for(j=0;j<=i;j++) { %>
+                        <%
+                                if(j!=i) {
+                                    str  += brd[j]+"/";
+                                } else {
+                                    str  += brd[j];
+                                }
+                        %>
+                    <% } %>
+                    <li><a href="<%= str%>"><%= brd[i] %></a></li>
+                    <% str  =   '' %>
+                <% } %>
+                </ul>
+            <% } %>
+            <div class="col-md-12 col-sm-12">
+                <div class='row'>
+                    <% if(!inner) { %>
+                        <% for(var i=0; i < data.length; i++) { %>
+                           <div class='col-md-12'>
+                             <span><a href="<%= data[i] %>"><%= data[i] %></a></span>
+                           </div>
+                        <% } %>
+                    <% } else {%>
+                        <% for(var i=0; i < data.length; i++) { %>
+                           <div class='col-md-10 col-sm-12'>
+                                <div>
+                                    <% if(data[i].isDir) {%>
+                                       <span class='col-md-6'><a href="<%= data[i].Url %>"><%= data[i].Name %></a></span>
+                                        <span class='col-md-6'>Dir</span>
+                                    <% } %>
+                                    <% if(data[i].isFile) {%>
+                                            <span class='col-md-6'><%= data[i].Name %></span>
+                                            <span class='col-md-6'><a class="icon file" draggable="true" target="_blank" href="/?editFile=<%= data[i].Url %>">Open File</a></span>
+                                    <% } %>
+                                </div>
+                           </div>
+                        <% } %>
+                    <% } %>
+                </div>
+            </div>
+    </div>
+</div>
+<!-- Modal -->
+<div id="createFile" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+
+    <!-- Modal content-->
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title">Create New File</h4>
+      </div>
+      <div class="modal-body">
+        <p>
+            <form method='post' action='/createNewFile' role="form">
+                <div class="form-group">
+                  <label for="fileName">File Name</label>
+                  <input type="text" name="fileName" class="form-control" id="fileName" title="Please enter file name with extension" require>
+                  <input type="hidden" class="form-control" id="dirname" name="DirectoryName" value="<%= currentUrl %>">
+                </div>
+                <button type="submit" class="btn btn-default">Submit</button>
+            </form>
+        </p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div id="createDir" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+
+    <!-- Modal content-->
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title">Create New Directory</h4>
+      </div>
+      <div class="modal-body">
+        <p>
+            <form method='post' action='/createNewDir' role="form">
+                <div class="form-group">
+                  <label for="fileName">Directory Name</label>
+                  <input type="text" name="dirName" class="form-control" id="dirName" title="Please enter file name with extension" require>
+                  <input type="hidden" class="form-control" id="dirname" name="DirectoryName" value="<%= currentUrl %>">
+                </div>
+                <button type="submit" class="btn btn-default">Submit</button>
+            </form>
+        </p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+    function OpenInNewTab(url) {
+        var win = window.open(url, '_blank');
+        win.focus();
+    }
+</script>
+ 
+</body>
+</html>

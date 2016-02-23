@@ -1,0 +1,112 @@
+<html>
+<head> 
+	<title>File Browser</title>
+        <script src="//code.jquery.com/jquery-1.12.0.min.js"></script>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css" integrity="sha384-fLW2N01lMqjakBkx3l/M9EahuwpSfeNvV63J5ezn3uZzapT0u7EYsXMjQV+0En5r" crossorigin="anonymous">
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
+        <script src="//cdn.ckeditor.com/4.5.7/standard/ckeditor.js"></script>
+</head>
+<body>
+<div class='container'>
+    <div class="row">
+        <div class="page-header">
+            <h1>File manager<small> <%= fileDetails['url']%></small></h1>
+        </div>
+            <% if (typeof brd != 'undefined' ) {%>
+                <ul class='breadcrumb'>
+                <% for(i=0;i<=brd.length;i++) { var str; %>
+                    <% for(j=0;j<=i;j++) { %>
+                        <%
+                                if(j!=i) {
+                                    str  += brd[j]+"/";
+                                } else {
+                                    str  += brd[j];
+                                }
+                        %>
+                    <% } %>
+                    <li><a href="<%= str%>"><%= brd[i] %></a></li>
+                    <% str  =   '' %>
+                <% } %>
+                </ul>
+            <% } %>
+        <% if(message) { %>
+            <div><%= message %></div>
+        <% } %>
+        <div class='col-md-12'>
+        <form action='/saveFile' method='post' id="oprationForm">
+            <div class = "form-group">
+                <input type="hidden"  class = "form-control" name='fileUrl' id="fileUrl" value='<%= fileDetails['url']%>'  require>
+                <textarea name='code' class='form-control this editor' disabled><%= data%></textarea>
+                <br/><br/>
+                <input type='button' class='btn btn-default disabledButton btn-primary' value='Update file'>
+                <input type='submit' class='btn btn-default btn-success updateButton'   value='Update Now'>
+                <input type='button' class='btn btn-default deleteFile btn-danger' data-toggle="modal" data-target="#deleteFile"      value='Delete File'>
+                <input type='button' class='btn btn-default btn-info cencleButton' value='Cencle Opration' >
+            </div>
+        </form>
+        </div>
+    </div>
+</div>
+<script>
+    jQuery(document).ready(function(){
+        jQuery('.disabledButton').click(function(){
+            jQuery(this).hide(function(){
+                jQuery('textarea.editor').removeAttr('disabled');
+                jQuery('.updateButton').show();
+            });
+        });
+
+        jQuery('.cencleButton').click(function(){
+            jQuery('.updateButton').hide(function(){
+                jQuery('.disabledButton').show(function(){
+                    jQuery('textarea.editor').attr('disabled','disabled');
+                })
+            })
+        })
+    });
+</script>
+
+<div id="deleteFile" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+
+    <!-- Modal content-->
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title">Are you really want to delete file</h4>
+      </div>
+      <div class="modal-body">
+        <p>
+           This opration will not be revert. <br/>
+            <form method='post' action='/deleteFile' role="form">
+                <div class="form-group">
+                  <input type="text" class="form-control" id="dirname" name="DirectoryName" value="<%= fileDetails.url %>">
+                  <input type="hidden" class="form-control" id="currentUrl" name="currentUrl" value="<%= currentUrl %>">
+                </div>
+                <button type="submit" class="btn btn-default">Delete</button>
+            </form>
+        </p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<style>
+    .updateButton {
+        display:none;
+    }
+    textarea.editor {
+        width: 100%;
+        min-height: 600px;
+        overflow-x: auto;
+        border: 1px solid orange;
+        padding: 10px;
+    }
+</style>
+<body>
+</html>
